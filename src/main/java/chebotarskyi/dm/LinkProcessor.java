@@ -109,7 +109,7 @@ public class LinkProcessor {
 
     private void index(String url, Element body) {
         try {
-            indexUtils.addDoc(url, body.html());
+            indexUtils.addDoc(url, body.text());
         } catch (IOException e) {
             System.out.println("Cannot index url: " + url);
         }

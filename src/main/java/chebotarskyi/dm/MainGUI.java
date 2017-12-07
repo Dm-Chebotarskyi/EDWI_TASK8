@@ -7,15 +7,13 @@ import javax.swing.*;
 public class MainGUI {
 
     private JPanel rootPanel;
-    private JTextField link_secsion_link_field;
-    private JTextField link_secsion_count_field;
-    private JLabel link_secsion_error_label;
+    private JTextField link_section_link_field;
+    private JTextField link_section_count_field;
+    private JLabel link_section_error_label;
     private JButton processButton;
     private JTextPane result_pane;
     private JButton doItButton;
     private JTextField queryToProcessTextField;
-    private JTextField urlPartQueryField;
-    private JCheckBox exactMatchCheckBox;
 
     private QueryProcessor queryProcessor;
 
@@ -43,16 +41,16 @@ public class MainGUI {
 
         queryProcessor.closeIndex();
 
-        String url = link_secsion_link_field.getText();
+        String url = link_section_link_field.getText();
         int count;
         try {
-            count = Integer.parseInt(link_secsion_count_field.getText());
+            count = Integer.parseInt(link_section_count_field.getText());
         } catch (NumberFormatException e) {
-            link_secsion_error_label.setText("Incorrect number");
+            link_section_error_label.setText("Incorrect number");
             return;
         }
         if (!Validator.isLinkValid(url)) {
-            link_secsion_error_label.setText("Incorrect link");
+            link_section_error_label.setText("Incorrect link");
             return;
         }
 
@@ -63,39 +61,23 @@ public class MainGUI {
 
         indexUtils.closeWriter();
 
-        link_secsion_error_label.setText("Done");
+        link_section_error_label.setText("Done");
     }
 
     private void queryButtonClick() {
         queryProcessor = new QueryProcessor();
 
-        StringBuilder builder = new StringBuilder();
-
-        if (!urlPartQueryField.getText().isEmpty()) {
-            builder.append("url: ");
-            builder.append(urlPartQueryField.getText());
-            builder.append("*");
-        }
-
-        if (!queryToProcessTextField.getText().isEmpty()) {
-            if (!builder.toString().isEmpty())
-                builder.append(" AND ");
-            builder.append("body:");
-            if (exactMatchCheckBox.isSelected()) {
-                builder.append("\"");
-                builder.append(queryToProcessTextField.getText());
-                builder.append("\"");
-            } else {
-                builder.append(queryToProcessTextField.getText());
-            }
-        }
-
-        System.out.println(builder.toString());
+        String query = queryToProcessTextField.getText();
 
         try {
-            result_pane.setText(queryProcessor.processQuery(builder.toString()));
+            String context = queryProcessor.processQuery(query);
+
+            result_pane.setText(context);
+
         } catch (ParseException e) {
             result_pane.setText("Error while parsing query");
+        } catch (NotFoundException e) {
+            result_pane.setText("No text found with specified text");
         }
     }
 
