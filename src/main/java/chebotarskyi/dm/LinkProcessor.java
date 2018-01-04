@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
@@ -73,6 +74,9 @@ public class LinkProcessor {
 
         String rootDomain = getDomainName(link);
 
+        if (rootDomain.contains("bikewale"))
+            return new HashSet<String>();
+
         try {
             Element body = getBodyFrom(link);
 
@@ -109,7 +113,13 @@ public class LinkProcessor {
 
     private void index(String url, Element body) {
         try {
-            indexUtils.addDoc(url, body.text());
+
+            Elements ps = body.getElementsByTag("p");
+            for (Element p : ps) {
+                if (p.text().length() > 100)
+                    indexUtils.addDoc(url, p.text());
+            }
+
         } catch (IOException e) {
             System.out.println("Cannot index url: " + url);
         }

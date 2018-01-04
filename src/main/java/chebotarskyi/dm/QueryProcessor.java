@@ -52,7 +52,12 @@ public class QueryProcessor {
             if (hits.length > 0) {
                 Document d = searcher.doc(hits[0].doc);
 
-                Formatter formatter = new SimpleHTMLFormatter();
+                Formatter formatter = new Formatter() {
+                    @Override
+                    public String highlightTerm(String s, TokenGroup tokenGroup) {
+                        return tokenGroup.getTotalScore() <= 0 ? s : s.toUpperCase();
+                    }
+                };
 
                 //It scores text fragments by the number of unique query terms found
                 //Basically the matching score in layman terms
@@ -62,7 +67,7 @@ public class QueryProcessor {
                 Highlighter highlighter = new Highlighter(formatter, scorer);
 
                 //It breaks text up into same-size texts but does not split up spans
-                Fragmenter fragmenter = new SimpleSpanFragmenter(scorer, 100);
+                Fragmenter fragmenter = new SimpleSpanFragmenter(scorer, 250);
 
                 highlighter.setTextFragmenter(fragmenter);
 
